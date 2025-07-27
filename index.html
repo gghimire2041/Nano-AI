@@ -386,7 +386,65 @@
             
             .innovations-grid {
                 grid-template-columns: 1fr;
+        function openChat(modelType) {
+            currentModel = modelType;
+            const config = modelConfigs[modelType];
+            
+            document.documentElement.style.setProperty('--chat-color', config.color);
+            document.getElementById('chatTitle').textContent = `Chat with Mini ${config.name}`;
+            
+            if (!chatHistory[modelType]) {
+                chatHistory[modelType] = [];
+                addMessage('bot', config.greeting, modelType);
             }
+            
+            displayChatHistory(modelType);
+            document.getElementById('chatModal').style.display = 'block';
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeChat() {
+            document.getElementById('chatModal').style.display = 'none';
+            currentModel = '';
+        }
+
+        function displayChatHistory(modelType) {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            if (chatHistory[modelType]) {
+                chatHistory[modelType].forEach(msg => {
+                    addMessageToDOM(msg.type, msg.content);
+                });
+            }
+            
+            scrollToBottom();
+        }
+
+        function addMessage(type, content, modelType = currentModel) {
+            if (!chatHistory[modelType]) {
+                chatHistory[modelType] = [];
+            }
+            
+            chatHistory[modelType].push({ type, content });
+            
+            if (modelType === currentModel) {
+                addMessageToDOM(type, content);
+                scrollToBottom();
+            }
+        }
+
+        function addMessageToDOM(type, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = content;
+            
+            messageDiv.appendChild(bubbleDiv);
+            messagesContainer.appendChild(messageDiv);
         }
     </style>
 </head>
@@ -981,6 +1039,57 @@
                     deepseek: "Let me process this through my specialized reasoning modules. I'll apply focused expertise to solve this problem. Using advanced reasoning capabilities for this task. Let me break this down systematically. Here's my detailed analysis of the situation.",
                     claude: "I want to be helpful, harmless, and honest in my response. Let me make sure my answer is both accurate and safe. I'll be thoughtful about the implications of this topic. Is there anything concerning about this request I should address? I aim to provide balanced and ethical guidance."
                 };
+
+        // Updated to use your deployed API
+        async function generateResponse(userMessage, modelType) {
+            try {
+                // Replace with YOUR actual deployment URL
+                const API_URL = 'https://YOUR-DEPLOYMENT-URL-HERE.com';  // 👈 CHANGE THIS!
+                
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: modelType,
+                        message: userMessage
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Return the REAL neural network output
+                return `🧠 [${modelType.toUpperCase()} Real Neural Output]: ${data.response}`;
+                
+            } catch (error) {
+                console.error('Error calling Python API:', error);
+                
+                // Enhanced fallback message
+                return `❌ Could not connect to Python API.
+
+🔗 **Current API URL:** ${API_URL || 'Not set'}
+📍 **Expected endpoint:** ${API_URL}/chat
+
+✅ **To fix this:**
+1. Make sure your Flask API is deployed and running
+2. Update the API_URL in the HTML code with your actual deployment URL
+3. Test your API by visiting: ${API_URL}/health
+
+🌐 **GitHub Pages:** https://gghimire2041.github.io/Nano-AI/
+📂 **Your repo:** https://github.com/gghimire2041/Nano-AI
+
+💡 **Common deployment URLs:**
+• Railway: https://nano-ai-production-xyz.up.railway.app
+• Render: https://nano-ai-xyz.onrender.com  
+• Vercel: https://nano-ai-xyz.vercel.app
+• Heroku: https://nano-ai-xyz.herokuapp.com`;
+            }
+        }
                 return data[this.modelType] || data.chatgpt;
             }
             
@@ -1388,9 +1497,53 @@
             
             messageDiv.appendChild(bubbleDiv);
             messagesContainer.appendChild(messageDiv);
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && currentModel) {
+                addMessage('user', message);
+                input.value = '';
+                
+                showTypingIndicator();
+                document.getElementById('sendBtn').disabled = true;
+                
+                // Call the async generateResponse function
+                generateResponse(message, currentModel).then(response => {
+                    hideTypingIndicator();
+                    addMessage('bot', response);
+                    document.getElementById('sendBtn').disabled = false;
+                    input.focus();
+                }).catch(error => {
+                    console.error('Error generating response:', error);
+                    hideTypingIndicator();
+                    addMessage('bot', 'Sorry, I encountered an error generating a response.');
+                    document.getElementById('sendBtn').disabled = false;
+                    input.focus();
+                });
+            }
         }
 
-        function sendMessage() {
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             
