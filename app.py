@@ -295,4 +295,4 @@ def health():
 if __name__ == '__main__':
     print("🚀 Starting Flask API server...")
     print("💡 Your HTML can now get real AI responses at http://localhost:8080/chat")
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(debug=True, host='0.0.0.0', port=5000)
