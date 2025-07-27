@@ -218,7 +218,7 @@ Anthropic's safety-focused AI built with Constitutional AI principles. Features 
 
 ---
 
-## [Interactive Demo](https://gghimire2041.github.io/nano-AI)
+## [Interactive Demo](https://gghimire2041.github.io/Nano-AI)
 
 ### 🚀 Try the Miniature Implementations
 
