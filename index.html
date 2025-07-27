@@ -934,66 +934,398 @@
         let currentModel = '';
         const chatHistory = {};
 
+        // Simple tokenizer (ported from Python)
+        class SimpleTokenizer {
+            constructor() {
+                this.charToIdx = {};
+                this.idxToChar = {};
+                this.vocabSize = 0;
+            }
+            
+            fit(text) {
+                const chars = [...new Set(text)].sort();
+                this.vocabSize = chars.length;
+                this.charToIdx = Object.fromEntries(chars.map((ch, i) => [ch, i]));
+                this.idxToChar = Object.fromEntries(chars.map((ch, i) => [i, ch]));
+            }
+            
+            encode(text) {
+                return text.split('').map(ch => this.charToIdx[ch] || 0);
+            }
+            
+            decode(tokens) {
+                return tokens.map(tok => this.idxToChar[tok] || '<UNK>').join('');
+            }
+        }
+
+        // Miniature AI Models (ported from Python)
+        class MiniAIModel {
+            constructor(modelType) {
+                this.modelType = modelType;
+                this.tokenizer = new SimpleTokenizer();
+                this.initializeModel();
+            }
+            
+            initializeModel() {
+                // Initialize with training data based on model type
+                const trainingData = this.getTrainingData();
+                this.tokenizer.fit(trainingData);
+                this.isInitialized = true;
+            }
+            
+            getTrainingData() {
+                const data = {
+                    chatgpt: "Hello! How can I help you today? I'm here to assist with any questions you have. What would you like to know about? I can help with explanations, writing, and problem-solving. Feel free to ask me anything!",
+                    grok: "Let me think about this differently. Here's an unconventional perspective on that question. That's an interesting way to look at it! I love exploring creative solutions to problems. What if we approached this from a totally different angle?",
+                    gemini: "I can help you with text, images, and multimodal tasks. Let me analyze this comprehensively for you. Here's what I understand from your input. I can process different types of information together. Would you like me to explain this step by step?",
+                    deepseek: "Let me process this through my specialized reasoning modules. I'll apply focused expertise to solve this problem. Using advanced reasoning capabilities for this task. Let me break this down systematically. Here's my detailed analysis of the situation.",
+                    claude: "I want to be helpful, harmless, and honest in my response. Let me make sure my answer is both accurate and safe. I'll be thoughtful about the implications of this topic. Is there anything concerning about this request I should address? I aim to provide balanced and ethical guidance."
+                };
+                return data[this.modelType] || data.chatgpt;
+            }
+            
+            generateResponse(prompt, maxLength = 50) {
+                // Simulate model-specific processing
+                const responses = this.getModelResponses();
+                const contextualResponses = this.getContextualResponses(prompt);
+                
+                // Check for specific query types
+                if (prompt.toLowerCase().includes('architecture') || prompt.toLowerCase().includes('how do you work')) {
+                    return this.getArchitectureResponse();
+                }
+                
+                if (prompt.toLowerCase().includes('what are you') || prompt.toLowerCase().includes('who are you')) {
+                    return this.getIdentityResponse();
+                }
+                
+                // For complex queries
+                if (prompt.length > 100 || this.isComplexQuery(prompt)) {
+                    return this.getComplexQueryResponse();
+                }
+                
+                // Generate contextual response
+                let response = this.selectBestResponse(prompt, [...responses, ...contextualResponses]);
+                
+                // Add model-specific processing indicators
+                return this.addProcessingContext(response);
+            }
+            
+            getModelResponses() {
+                const responses = {
+                    chatgpt: [
+                        "That's a great question! Let me help you understand this concept.",
+                        "I'd be happy to explain that for you using my transformer architecture.",
+                        "Based on my RLHF training, here's what I can tell you about this topic.",
+                        "Let me break this down in a clear and helpful way.",
+                        "I can provide some insights on this subject through my neural networks.",
+                        "Excellent question! My pre-layer normalization is processing this.",
+                        "Drawing from my training data, I can help with this.",
+                        "My GELU activations are working on a comprehensive response.",
+                        "Let me use my causal attention to address your query.",
+                        "Perfect! My autoregressive generation can help explain this."
+                    ],
+                    grok: [
+                        "Ah, now that's an interesting angle! Let me flip this upside down for you.",
+                        "Here's a rebellious take on your question that might surprise you.",
+                        "Time to activate unconventional thinking mode!",
+                        "Let me route this through my most creative expert networks.",
+                        "Plot twist incoming - here's a perspective you probably haven't considered.",
+                        "My expert gating is selecting the most unconventional approach.",
+                        "Sparse activation engaged! Only my wildest experts are firing.",
+                        "Time for some serious out-of-the-box expert routing.",
+                        "My top-k selection just picked the most creative experts.",
+                        "Load balancing complete - routing to my rebellious knowledge domains."
+                    ],
+                    gemini: [
+                        "Processing this through my multimodal understanding capabilities.",
+                        "Let me analyze this systematically across multiple dimensions.",
+                        "My advanced reasoning engines are working on this comprehensively.",
+                        "Applying multi-query attention to understand all aspects of your question.",
+                        "Using my SwiGLU activations to process this efficiently.",
+                        "My shared K,V projections are optimizing this analysis.",
+                        "RoPE encoding is helping me understand the relationships here.",
+                        "Multimodal processing engaged for comprehensive understanding.",
+                        "My attention heads are collaborating on this query.",
+                        "Rotary position encoding is enhancing my contextual awareness."
+                    ],
+                    deepseek: [
+                        "Engaging specialized reasoning modules for systematic analysis.",
+                        "Applying load-balanced expert selection for optimal processing.",
+                        "My mathematical reasoning experts are collaborating on this.",
+                        "Processing through optimized MoE architecture for deep understanding.",
+                        "Using step-by-step logical reasoning to address your query.",
+                        "Noise injection complete - experts are exploring all possibilities.",
+                        "SiLU activations are providing smooth gradient flow for this analysis.",
+                        "My auxiliary loss is ensuring balanced expert utilization.",
+                        "Load balancing algorithms are selecting optimal reasoning pathways.",
+                        "Deep reasoning modules are conducting systematic exploration."
+                    ],
+                    claude: [
+                        "I want to provide a helpful and responsible response to your question.",
+                        "Let me ensure my answer is both accurate and ethically sound.",
+                        "Processing this through my Constitutional AI principles.",
+                        "I'll provide a balanced perspective while being mindful of safety.",
+                        "My harmlessness scoring indicates this is appropriate to discuss.",
+                        "GLU gating mechanisms are ensuring controlled information flow.",
+                        "Constitutional training is guiding my response generation.",
+                        "Safety-first architecture is processing your request thoughtfully.",
+                        "My helpfulness evaluation confirms this is a good query to address.",
+                        "Principle-based reasoning is generating an appropriate response."
+                    ]
+                };
+                return responses[this.modelType] || responses.chatgpt;
+            }
+            
+            getContextualResponses(prompt) {
+                const lower = prompt.toLowerCase();
+                const contextual = [];
+                
+                if (lower.includes('hello') || lower.includes('hi')) {
+                    const greetings = {
+                        chatgpt: [
+                            `Hello! I'm Mini ChatGPT. How can I assist you today?`,
+                            `Hi there! I'm ready to help with any questions you have.`,
+                            `Greetings! I'm here to provide helpful responses using my RLHF training.`,
+                            `Hello! My decoder-only transformer is ready to chat with you.`,
+                            `Hi! I'm excited to help you explore AI concepts today.`
+                        ],
+                        grok: [
+                            `Hey! Ready for some unconventional AI insights?`,
+                            `Hello there, fellow curious soul! Time to think differently.`,
+                            `Hi! My expert networks are buzzing with creative energy.`,
+                            `Greetings! Let's explore some rebellious AI perspectives.`,
+                            `Hey! My MoE routing is ready for anything you throw at me.`
+                        ],
+                        gemini: [
+                            `Greetings! My multimodal systems are ready for analysis.`,
+                            `Hello! I'm processing your greeting through multi-query attention.`,
+                            `Hi there! My SwiGLU activations are warmed up and ready.`,
+                            `Greetings! Ready for comprehensive, systematic analysis.`,
+                            `Hello! My RoPE encoding is helping me understand you perfectly.`
+                        ],
+                        deepseek: [
+                            `Hello! My reasoning modules are primed for deep analysis.`,
+                            `Greetings! Load balancing complete - ready for logical exploration.`,
+                            `Hi! My expert networks are synchronized for mathematical thinking.`,
+                            `Hello! SiLU activations online - let's dive deep together.`,
+                            `Greetings! My systematic reasoning capabilities await your questions.`
+                        ],
+                        claude: [
+                            `Hi! I'm here to help in a safe, responsible manner.`,
+                            `Hello! My constitutional principles are guiding me to assist you.`,
+                            `Greetings! I aim to be helpful, harmless, and honest with you.`,
+                            `Hi there! My GLU activations are ensuring ethical responses.`,
+                            `Hello! Safety checks complete - ready for thoughtful conversation.`
+                        ]
+                    };
+                    
+                    const modelGreetings = greetings[this.modelType] || greetings.chatgpt;
+                    contextual.push(modelGreetings[Math.floor(Math.random() * modelGreetings.length)]);
+                }
+                
+                if (lower.includes('thank')) {
+                    const thankResponses = {
+                        chatgpt: [
+                            "You're very welcome! I'm glad I could help.",
+                            "My pleasure! Feel free to ask anything else.",
+                            "Happy to assist! That's what I'm designed for.",
+                            "You're welcome! I enjoy helping users learn."
+                        ],
+                        grok: [
+                            "No problem! My experts enjoyed that challenge.",
+                            "You're welcome! Always fun to think outside the box.",
+                            "Glad to help! My routing network loved that query.",
+                            "Anytime! Unconventional problems are my specialty."
+                        ],
+                        gemini: [
+                            "You're welcome! My multimodal analysis was thorough.",
+                            "Happy to help! My attention mechanisms were well-utilized.",
+                            "My pleasure! Comprehensive assistance is my goal.",
+                            "You're welcome! My efficiency optimizations paid off."
+                        ],
+                        deepseek: [
+                            "You're welcome! My reasoning was systematic and complete.",
+                            "Glad to help! My expert networks collaborated well.",
+                            "My pleasure! Deep analysis yields better solutions.",
+                            "You're welcome! Logical reasoning at your service."
+                        ],
+                        claude: [
+                            "You're very welcome! I'm glad my response was helpful and appropriate.",
+                            "My pleasure! I aimed to be both useful and responsible.",
+                            "Happy to help! My constitutional training guides me to assist.",
+                            "You're welcome! I strive for helpful, ethical responses."
+                        ]
+                    };
+                    
+                    const modelThanks = thankResponses[this.modelType] || thankResponses.chatgpt;
+                    contextual.push(modelThanks[Math.floor(Math.random() * modelThanks.length)]);
+                }
+                
+                if (lower.includes('explain') || lower.includes('what is')) {
+                    const explainResponses = {
+                        chatgpt: [
+                            "I'd be happy to explain that concept for you!",
+                            "Let me break that down in a clear, helpful way.",
+                            "Great question! I'll explain this step by step.",
+                            "I can definitely help clarify that for you."
+                        ],
+                        grok: [
+                            "Time to explain this with a fresh perspective!",
+                            "Let me route this to my most creative explanation experts.",
+                            "I'll explain this in a way you've never heard before!",
+                            "Perfect! My unconventional explanation mode is activated."
+                        ],
+                        gemini: [
+                            "I'll provide a comprehensive, multi-dimensional explanation.",
+                            "Let me analyze this systematically and explain clearly.",
+                            "My multimodal understanding will help explain this perfectly.",
+                            "I'll process this through multiple attention layers for clarity."
+                        ],
+                        deepseek: [
+                            "Let me apply systematic reasoning to explain this clearly.",
+                            "I'll break this down using logical, step-by-step analysis.",
+                            "My specialized reasoning experts will explain this thoroughly.",
+                            "Perfect! Time for deep, methodical explanation."
+                        ],
+                        claude: [
+                            "I'll explain this thoughtfully and responsibly.",
+                            "Let me provide a balanced, accurate explanation.",
+                            "I'll ensure my explanation is both helpful and appropriate.",
+                            "I'll explain this with care for accuracy and safety."
+                        ]
+                    };
+                    
+                    const modelExplains = explainResponses[this.modelType] || explainResponses.chatgpt;
+                    contextual.push(modelExplains[Math.floor(Math.random() * modelExplains.length)]);
+                }
+                
+                return contextual;
+            }
+            
+            selectBestResponse(prompt, responses) {
+                // Enhanced selection with more variety
+                const lower = prompt.toLowerCase();
+                
+                // For creative/different requests, prioritize creative responses
+                if (lower.includes('creative') || lower.includes('different') || lower.includes('unique')) {
+                    const creativeResponses = responses.filter(r => 
+                        r.includes('creative') || r.includes('unconventional') || 
+                        r.includes('different') || r.includes('unique')
+                    );
+                    if (creativeResponses.length > 0) {
+                        return creativeResponses[Math.floor(Math.random() * creativeResponses.length)];
+                    }
+                }
+                
+                // For technical requests, prioritize technical responses
+                if (lower.includes('technical') || lower.includes('how') || lower.includes('architecture')) {
+                    const techResponses = responses.filter(r => 
+                        r.includes('technical') || r.includes('process') || 
+                        r.includes('architecture') || r.includes('system')
+                    );
+                    if (techResponses.length > 0) {
+                        return techResponses[Math.floor(Math.random() * techResponses.length)];
+                    }
+                }
+                
+                // For simple questions, use any response randomly
+                if (responses.length > 0) {
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+                
+                // Fallback
+                return "I'm processing your request through my neural networks...";
+            }
+            
+            addProcessingContext(response) {
+                const contexts = {
+                    chatgpt: "🧠 [Decoder-only Transformer]: ",
+                    grok: "⚡ [MoE Expert Routing]: ",
+                    gemini: "💎 [Multi-Query Attention]: ",
+                    deepseek: "🔍 [Optimized MoE]: ",
+                    claude: "🎭 [Constitutional AI]: "
+                };
+                
+                return contexts[this.modelType] + response;
+            }
+            
+            getArchitectureResponse() {
+                const architectures = {
+                    chatgpt: "I use a decoder-only transformer with pre-layer normalization, GELU activations, and RLHF training. My architecture processes tokens autoregressively, using causal masking to ensure each token only attends to previous tokens.",
+                    grok: "I'm built with Mixture of Experts (MoE) architecture. My gating network routes queries to the top-2 most relevant expert networks out of multiple specialists, enabling massive scaling with constant compute cost per token.",
+                    gemini: "I use multi-query attention where key and value projections are shared across heads for efficiency. My SwiGLU activations and rotary position encoding enable superior multimodal understanding and processing.",
+                    deepseek: "I implement optimized MoE with load balancing to prevent expert collapse, noise injection for better exploration, and SiLU activations throughout for smooth gradient flow and enhanced reasoning.",
+                    claude: "I use GLU (Gated Linear Units) for controlled information flow and Constitutional AI training. My architecture includes built-in harmlessness and helpfulness scoring mechanisms for safe, ethical responses."
+                };
+                return this.addProcessingContext(architectures[this.modelType]);
+            }
+            
+            getIdentityResponse() {
+                const identities = {
+                    chatgpt: "I'm a miniature implementation of ChatGPT, demonstrating decoder-only transformer architecture with RLHF training. I showcase how autoregressive language models generate text token by token.",
+                    grok: "I'm Mini Grok, powered by Mixture of Experts architecture. I demonstrate how different expert networks can specialize in different domains while maintaining efficient computation through sparse activation.",
+                    gemini: "I'm Mini Gemini, featuring multi-query attention and multimodal capabilities. I show how shared key-value projections and advanced attention mechanisms enable efficient processing.",
+                    deepseek: "I'm Mini DeepSeek, showcasing optimized MoE with advanced load balancing. I demonstrate how sophisticated expert routing and noise injection improve mathematical and logical reasoning.",
+                    claude: "I'm Mini Claude, built with Constitutional AI principles. I demonstrate how GLU activations and safety-first architecture enable helpful, harmless, and honest AI behavior."
+                };
+                return this.addProcessingContext(identities[this.modelType]);
+            }
+            
+            getComplexQueryResponse() {
+                return this.addProcessingContext(`I'm just a miniature implementation of ${this.getModelName()} and this question seems quite complex. Please use the full AI system for detailed analysis and comprehensive answers like this!`);
+            }
+            
+            isComplexQuery(prompt) {
+                const complexIndicators = ['detailed research', 'comprehensive analysis', 'write a paper', 'full report', 'in-depth study'];
+                return complexIndicators.some(indicator => prompt.toLowerCase().includes(indicator));
+            }
+            
+            getModelName() {
+                const names = {
+                    chatgpt: 'ChatGPT',
+                    grok: 'Grok', 
+                    gemini: 'Gemini',
+                    deepseek: 'DeepSeek',
+                    claude: 'Claude'
+                };
+                return names[this.modelType];
+            }
+        }
+
+        // Initialize models
+        const models = {
+            chatgpt: new MiniAIModel('chatgpt'),
+            grok: new MiniAIModel('grok'),
+            gemini: new MiniAIModel('gemini'),
+            deepseek: new MiniAIModel('deepseek'),
+            claude: new MiniAIModel('claude')
+        };
+
         const modelConfigs = {
             chatgpt: {
                 name: 'ChatGPT',
                 color: '#10a37f',
-                greeting: "Hello! I'm a miniature version of ChatGPT, demonstrating decoder-only transformer architecture with RLHF training. I can help explain concepts, answer questions, and have conversations. What would you like to explore?",
-                responses: [
-                    "That's an interesting question! Using my pre-layer normalization and GELU activations...",
-                    "Let me process that through my transformer blocks with causal attention...",
-                    "Based on my RLHF training, here's my helpful response...",
-                    "My autoregressive architecture allows me to generate coherent responses...",
-                    "Drawing from my training data through attention mechanisms..."
-                ]
+                greeting: "Hello! I'm a miniature version of ChatGPT, demonstrating decoder-only transformer architecture with RLHF training. I can help explain concepts, answer questions, and have conversations. What would you like to explore?"
             },
             grok: {
                 name: 'Grok',
                 color: '#1d9bf0',
-                greeting: "Hey! I'm Mini Grok, powered by Mixture of Experts architecture. My specialized expert networks let me route different types of queries to the most suitable knowledge domains. Ready for some unconventional insights?",
-                responses: [
-                    "Routing to Expert Network 3 (Creative Thinking) for this query...",
-                    "My top-2 experts are activating: Math Expert and Philosophy Expert...",
-                    "Interesting! My expert gating mechanism is selecting unconventional pathways...",
-                    "Load balancing across my 4 expert networks for optimal response...",
-                    "Sparse activation engaged - only relevant experts firing for this one..."
-                ]
+                greeting: "Hey! I'm Mini Grok, powered by Mixture of Experts architecture. My specialized expert networks let me route different types of queries to the most suitable knowledge domains. Ready for some unconventional insights?"
             },
             gemini: {
                 name: 'Gemini',
                 color: '#4285f4',
-                greeting: "Greetings! I'm Mini Gemini, featuring multi-query attention and SwiGLU activations. My architecture is optimized for multimodal understanding and efficient processing. I can analyze complex queries systematically!",
-                responses: [
-                    "Processing through my multi-query attention layers with shared K,V projections...",
-                    "My RoPE encoding is helping me understand the relationships here...",
-                    "Using SwiGLU activations for enhanced information processing...",
-                    "My multimodal architecture allows comprehensive analysis of this query...",
-                    "Applying rotary position encoding for better context understanding..."
-                ]
+                greeting: "Greetings! I'm Mini Gemini, featuring multi-query attention and SwiGLU activations. My architecture is optimized for multimodal understanding and efficient processing. I can analyze complex queries systematically!"
             },
             deepseek: {
                 name: 'DeepSeek',
                 color: '#ff6b6b',
-                greeting: "Hello! I'm Mini DeepSeek, featuring optimized Mixture of Experts with advanced load balancing. My architecture excels at systematic reasoning and mathematical logic. Let's dive deep into your question!",
-                responses: [
-                    "Applying load-balanced expert routing with noise injection for optimal selection...",
-                    "My SiLU activations are processing this through specialized reasoning experts...",
-                    "Using optimized MoE with auxiliary loss for balanced expert utilization...",
-                    "Systematic analysis through my reasoning-focused expert networks...",
-                    "Load balancing algorithms selecting optimal experts for this query type..."
-                ]
+                greeting: "Hello! I'm Mini DeepSeek, featuring optimized Mixture of Experts with advanced load balancing. My architecture excels at systematic reasoning and mathematical logic. Let's dive deep into your question!"
             },
             claude: {
                 name: 'Claude',
                 color: '#d97706',
-                greeting: "Hi! I'm Mini Claude, built with Constitutional AI principles and GLU activations. My architecture includes built-in safety mechanisms and ethical reasoning capabilities. I aim to be helpful, harmless, and honest!",
-                responses: [
-                    "Processing through GLU-gated layers while checking constitutional principles...",
-                    "My harmlessness scoring indicates this is a safe and helpful response...",
-                    "Using gated activations to ensure controlled and responsible information flow...",
-                    "Constitutional AI training guides me to provide balanced, ethical responses...",
-                    "Safety-first architecture ensuring my response meets helpfulness standards..."
-                ]
+                greeting: "Hi! I'm Mini Claude, built with Constitutional AI principles and GLU activations. My architecture includes built-in safety mechanisms and ethical reasoning capabilities. I aim to be helpful, harmless, and honest!"
             }
         };
 
@@ -1069,64 +1401,32 @@
                 showTypingIndicator();
                 document.getElementById('sendBtn').disabled = true;
                 
-                setTimeout(() => {
-                    const response = generateResponse(message, currentModel);
+                // Call the async generateResponse function
+                generateResponse(message, currentModel).then(response => {
                     hideTypingIndicator();
                     addMessage('bot', response);
                     document.getElementById('sendBtn').disabled = false;
                     input.focus();
-                }, 1500 + Math.random() * 2000);
+                }).catch(error => {
+                    console.error('Error generating response:', error);
+                    hideTypingIndicator();
+                    addMessage('bot', 'Sorry, I encountered an error generating a response.');
+                    document.getElementById('sendBtn').disabled = false;
+                    input.focus();
+                });
             }
         }
 
         function generateResponse(userMessage, modelType) {
+            // Use the actual AI model to generate response
+            const model = models[modelType];
+            if (model && model.isInitialized) {
+                return model.generateResponse(userMessage);
+            }
+            
+            // Fallback to simple response if model not available
             const config = modelConfigs[modelType];
-            const lowerMessage = userMessage.toLowerCase();
-            
-            if (lowerMessage.includes('architecture') || lowerMessage.includes('how do you work')) {
-                return getArchitectureResponse(modelType);
-            }
-            
-            if (lowerMessage.includes('what are you') || lowerMessage.includes('who are you')) {
-                return `I'm a miniature implementation of ${config.name}, demonstrating ${getArchitectureDescription(modelType)}. I'm designed to show you how these AI systems work!`;
-            }
-            
-            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-                return `Hello! I'm Mini ${config.name}. ${config.responses[Math.floor(Math.random() * config.responses.length)]}`;
-            }
-            
-            if (lowerMessage.length > 100 || 
-                lowerMessage.includes('complex') || 
-                lowerMessage.includes('detailed research') ||
-                lowerMessage.includes('comprehensive analysis')) {
-                return `I'm just a miniature implementation of ${config.name} and this question seems quite complex. Please use the full AI system for detailed analysis and comprehensive answers like this!`;
-            }
-            
-            const randomResponse = config.responses[Math.floor(Math.random() * config.responses.length)];
-            return `${randomResponse} Remember, I'm just a miniature demonstration of ${config.name}'s architecture. For full capabilities, please use the complete AI system!`;
-        }
-
-        function getArchitectureDescription(modelType) {
-            const descriptions = {
-                chatgpt: "decoder-only transformer architecture with RLHF training",
-                grok: "Mixture of Experts (MoE) with dynamic expert routing",
-                gemini: "multimodal transformer with multi-query attention and SwiGLU",
-                deepseek: "optimized MoE with load balancing and reasoning focus",
-                claude: "Constitutional AI with GLU activations and safety mechanisms"
-            };
-            return descriptions[modelType];
-        }
-
-        function getArchitectureResponse(modelType) {
-            const architectureInfo = {
-                chatgpt: "I use a decoder-only transformer with pre-layer normalization and GELU activations. My RLHF training aligns my responses with human preferences through reward modeling and policy optimization.",
-                grok: "I'm built with Mixture of Experts, where a gating network routes queries to the top-2 most relevant expert networks. This enables massive scaling with constant compute cost per token.",
-                gemini: "I use multi-query attention where key and value projections are shared across heads for efficiency. My SwiGLU activations and RoPE encoding enable superior multimodal understanding.",
-                deepseek: "I implement optimized MoE with load balancing to prevent expert collapse, noise injection for better exploration, and SiLU activations throughout for smooth gradient flow.",
-                claude: "I use GLU (Gated Linear Units) for controlled information flow and Constitutional AI training with built-in harmlessness and helpfulness scoring mechanisms."
-            };
-            
-            return architectureInfo[modelType];
+            return `I'm Mini ${config.name}, but I'm still initializing. Please try again in a moment!`;
         }
 
         function showTypingIndicator() {
@@ -1155,6 +1455,9 @@
                 closeChat();
             }
         });
+
+        // Initialize all models when page loads
+        console.log('🤖 Mini AI Models initialized:', Object.keys(models).map(key => `${models[key].getModelName()} (${key})`).join(', '));
     </script>
 </body>
 </html>
