@@ -981,7 +981,7 @@
             </div>
             <div class="chat-input-container">
                 <div class="chat-input-group">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
                     <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
                 </div>
             </div>
