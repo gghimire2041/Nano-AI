@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Models Architecture Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        .model-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            padding: 2rem;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+        }
+
+        .model-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .model-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .model-company {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .architecture-type {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .description {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            color: #555;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .process-flow {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .innovations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .innovation-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .innovation-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .innovation-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .specs-table {
+            background: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .specs-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .specs-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .specs-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .specs-table tr:nth-child(even) {
+            background: white;
+        }
+
+        .chat-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Model-specific colors */
+        .chatgpt { --primary-color: #10a37f; }
+        .grok { --primary-color: #1d9bf0; }
+        .gemini { --primary-color: #4285f4; }
+        .deepseek { --primary-color: #ff6b6b; }
+        .claude { --primary-color: #d97706; }
+
+        /* Chat Modal */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .chat-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 700px;
+            height: 80vh;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: var(--chat-color, #333);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.95rem;
+        }
+
+        .message.user .message-bubble {
+            background: var(--chat-color, #333);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-container {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .chat-input:focus {
+            border-color: var(--chat-color, #333);
+        }
+
+        .send-btn {
+            background: var(--chat-color, #333);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 1rem 1.5rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .innovations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Architecture Showcase</h1>
+            <p>Explore the unique architectures behind the world's most advanced AI systems</p>
+        </div>
+
+        <div class="models-grid">
+            <!-- ChatGPT -->
+            <div class="model-card chatgpt">
+                <div class="card-header">
+                    <div class="model-icon">🧠</div>
+                    <div class="model-title">ChatGPT</div>
+                    <div class="model-company">OpenAI</div>
+                    <div class="architecture-type">Decoder-only Transformer + RLHF</div>
+                </div>
+                <div class="card-content">
+                    <div class="description">
+                        Revolutionary conversational AI using GPT's autoregressive architecture enhanced with Reinforcement Learning from Human Feedback (RLHF) for alignment and safety.
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🏗️ Architecture Flow</div>
+                        <div class="process-flow">
+                            <div class="flow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Input Token Embedding + Positional Encoding</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Pre-LayerNorm → Multi-Head Self-Attention</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Residual Connection + Pre-LayerNorm</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Feed-Forward Network (GELU Activation)</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Output Layer → Next Token Prediction</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔧 Key Innovations</div>
+                        <div class="innovations-grid">
+                            <div class="innovation-card">
+                                <div class="innovation-title">Pre-Layer Normalization</div>
+                                <div class="innovation-desc">Applies LayerNorm before attention/FFN blocks for better gradient flow and training stability.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">GELU Activation</div>
+                                <div class="innovation-desc">Gaussian Error Linear Units provide smoother, probabilistic activation compared to ReLU.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">RLHF Training</div>
+                                <div class="innovation-desc">Reinforcement Learning from Human Feedback aligns model outputs with human preferences.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Causal Masking</div>
+                                <div class="innovation-desc">Ensures autoregressive generation - each token only attends to previous tokens.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📊 Technical Specifications</div>
+                        <div class="specs-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Specification</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Architecture</td>
+                                        <td>Decoder-only Transformer</td>
+                                        <td>Autoregressive text generation</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Attention</td>
+                                        <td>Multi-head self-attention</td>
+                                        <td>Learn token relationships</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Activation</td>
+                                        <td>GELU</td>
+                                        <td>Smooth, probabilistic activation</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Training</td>
+                                        <td>Supervised + RLHF</td>
+                                        <td>Human alignment & safety</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button class="chat-button" onclick="openChat('chatgpt')">Chat with Mini ChatGPT</button>
+                </div>
+            </div>
+
+            <!-- Grok -->
+            <div class="model-card grok">
+                <div class="card-header">
+                    <div class="model-icon">⚡</div>
+                    <div class="model-title">Grok</div>
+                    <div class="model-company">xAI</div>
+                    <div class="architecture-type">Mixture of Experts (MoE)</div>
+                </div>
+                <div class="card-content">
+                    <div class="description">
+                        Elon Musk's unconventional AI using Mixture of Experts architecture for efficient scaling. Routes different query types to specialized expert networks dynamically.
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">⚡ MoE Architecture Flow</div>
+                        <div class="process-flow">
+                            <div class="flow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Input Token → Gating Network Analysis</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Top-K Expert Selection (K=2)</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Parallel Expert Processing</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Weighted Expert Output Combination</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Load Balancing & Final Output</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔧 Key Innovations</div>
+                        <div class="innovations-grid">
+                            <div class="innovation-card">
+                                <div class="innovation-title">Expert Routing</div>
+                                <div class="innovation-desc">Gating network selects top-k experts for each token, enabling specialization without full activation.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Sparse Activation</div>
+                                <div class="innovation-desc">Only 2-8 experts activate per token, achieving massive scale with constant compute cost.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Load Balancing</div>
+                                <div class="innovation-desc">Auxiliary loss ensures experts are utilized evenly, preventing expert collapse.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Specialized Knowledge</div>
+                                <div class="innovation-desc">Different experts learn different domains (math, code, reasoning, creativity).</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📊 Technical Specifications</div>
+                        <div class="specs-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Configuration</th>
+                                        <th>Benefit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Experts</td>
+                                        <td>8-64 specialist networks</td>
+                                        <td>Domain specialization</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Routing</td>
+                                        <td>Top-K selection (K=2)</td>
+                                        <td>Efficient computation</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gating</td>
+                                        <td>Learnable router network</td>
+                                        <td>Dynamic expert selection</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Scaling</td>
+                                        <td>Constant compute, more experts</td>
+                                        <td>Massive capacity growth</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button class="chat-button" onclick="openChat('grok')">Chat with Mini Grok</button>
+                </div>
+            </div>
+
+            <!-- Gemini -->
+            <div class="model-card gemini">
+                <div class="card-header">
+                    <div class="model-icon">💎</div>
+                    <div class="model-title">Gemini</div>
+                    <div class="model-company">Google</div>
+                    <div class="architecture-type">Multimodal Transformer</div>
+                </div>
+                <div class="card-content">
+                    <div class="description">
+                        Google's most capable multimodal AI, natively processing text, images, audio, and code. Uses advanced attention mechanisms for efficiency and multimodal understanding.
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">💎 Multimodal Architecture Flow</div>
+                        <div class="process-flow">
+                            <div class="flow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Multimodal Input Processing</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Multi-Query Attention (Shared K,V)</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">SwiGLU Activation Processing</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Rotary Position Encoding</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Unified Multimodal Output</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔧 Key Innovations</div>
+                        <div class="innovations-grid">
+                            <div class="innovation-card">
+                                <div class="innovation-title">Multi-Query Attention</div>
+                                <div class="innovation-desc">Shared key/value projections across attention heads reduce memory and increase inference speed.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">SwiGLU Activation</div>
+                                <div class="innovation-desc">Swish-Gated Linear Units combine sigmoid gating with Swish activation for better performance.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">RoPE Encoding</div>
+                                <div class="innovation-desc">Rotary Position Encoding provides better length generalization and relative position understanding.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Native Multimodality</div>
+                                <div class="innovation-desc">Joint training on text, images, audio from the start, not adapters or separate encoders.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📊 Architecture Improvements</div>
+                        <div class="specs-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Innovation</th>
+                                        <th>Traditional</th>
+                                        <th>Gemini Improvement</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Attention</td>
+                                        <td>Multi-head (separate K,V)</td>
+                                        <td>Multi-query (shared K,V)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Position</td>
+                                        <td>Absolute encoding</td>
+                                        <td>Rotary Position Encoding</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Activation</td>
+                                        <td>ReLU/GELU</td>
+                                        <td>SwiGLU (gated activation)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Modality</td>
+                                        <td>Text-only, then adapted</td>
+                                        <td>Native multimodal training</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button class="chat-button" onclick="openChat('gemini')">Chat with Mini Gemini</button>
+                </div>
+            </div>
+
+            <!-- DeepSeek -->
+            <div class="model-card deepseek">
+                <div class="card-header">
+                    <div class="model-icon">🔍</div>
+                    <div class="model-title">DeepSeek</div>
+                    <div class="model-company">DeepSeek AI</div>
+                    <div class="architecture-type">Optimized MoE</div>
+                </div>
+                <div class="card-content">
+                    <div class="description">
+                        China's advanced reasoning model with heavily optimized Mixture of Experts. Features superior load balancing and expert utilization for mathematical and logical reasoning.
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔍 Optimized MoE Flow</div>
+                        <div class="process-flow">
+                            <div class="flow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Input + Noise Injection (Training)</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Load-Balanced Expert Selection</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Expert Processing (SiLU Activation)</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Usage Tracking & Auxiliary Loss</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Weighted Expert Output Combination</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔧 Key Innovations</div>
+                        <div class="innovations-grid">
+                            <div class="innovation-card">
+                                <div class="innovation-title">Load Balancing</div>
+                                <div class="innovation-desc">Advanced algorithms ensure all experts are utilized evenly, preventing dead experts and improving capacity.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Noise Injection</div>
+                                <div class="innovation-desc">Adds noise to gating logits during training to encourage exploration and better expert utilization.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">SiLU Throughout</div>
+                                <div class="innovation-desc">Sigmoid Linear Units (Swish) activation used consistently for smooth, differentiable activations.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Reasoning Focus</div>
+                                <div class="innovation-desc">Specialized training and expert allocation for mathematical, logical, and step-by-step reasoning tasks.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📊 Optimization Solutions</div>
+                        <div class="specs-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Optimization</th>
+                                        <th>Problem Solved</th>
+                                        <th>Method</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Expert Collapse</td>
+                                        <td>Some experts never used</td>
+                                        <td>Load balancing loss</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Poor Exploration</td>
+                                        <td>Limited expert diversity</td>
+                                        <td>Training noise injection</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reasoning Quality</td>
+                                        <td>Weak mathematical logic</td>
+                                        <td>Specialized expert training</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Efficiency</td>
+                                        <td>Wasted computation</td>
+                                        <td>Dynamic expert allocation</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button class="chat-button" onclick="openChat('deepseek')">Chat with Mini DeepSeek</button>
+                </div>
+            </div>
+
+            <!-- Claude -->
+            <div class="model-card claude">
+                <div class="card-header">
+                    <div class="model-icon">🎭</div>
+                    <div class="model-title">Claude</div>
+                    <div class="model-company">Anthropic</div>
+                    <div class="architecture-type">Constitutional AI</div>
+                </div>
+                <div class="card-content">
+                    <div class="description">
+                        Anthropic's safety-focused AI built with Constitutional AI principles. Features advanced gating mechanisms and built-in harmlessness evaluation for responsible AI behavior.
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🎭 Constitutional AI Flow</div>
+                        <div class="process-flow">
+                            <div class="flow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Input Safety Assessment</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">GLU-Gated Processing</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Constitutional Principles Check</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Response Generation</div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Harmlessness Verification</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔧 Key Innovations</div>
+                        <div class="innovations-grid">
+                            <div class="innovation-card">
+                                <div class="innovation-title">GLU Activation</div>
+                                <div class="innovation-desc">Gated Linear Units provide controllable information flow with learnable gating mechanisms.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Constitutional Training</div>
+                                <div class="innovation-desc">Self-supervised learning from a constitution of principles for helpful, harmless, honest behavior.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Safety Scoring</div>
+                                <div class="innovation-desc">Built-in harmfulness and helpfulness evaluation heads for real-time safety assessment.</div>
+                            </div>
+                            <div class="innovation-card">
+                                <div class="innovation-title">Principle-Based</div>
+                                <div class="innovation-desc">Responses generated based on explicit constitutional principles rather than just human feedback.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📊 Constitutional Principles</div>
+                        <div class="specs-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Constitutional Principle</th>
+                                        <th>Implementation</th>
+                                        <th>Safety Benefit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Helpfulness</td>
+                                        <td>Dedicated scoring head</td>
+                                        <td>Maximizes user utility</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Harmlessness</td>
+                                        <td>Safety evaluation layer</td>
+                                        <td>Prevents harmful outputs</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Honesty</td>
+                                        <td>Uncertainty quantification</td>
+                                        <td>Reduces hallucinations</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Transparency</td>
+                                        <td>Explainable reasoning</td>
+                                        <td>Auditable decisions</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button class="chat-button" onclick="openChat('claude')">Chat with Mini Claude</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3 id="chatTitle">Chat with AI</h3>
+                <button class="close-btn" onclick="closeChat()">&times;</button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span>AI is thinking...</span>
+            </div>
+            <div class="chat-input-container">
+                <div class="chat-input-group">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentModel = '';
+        const chatHistory = {};
+
+        const modelConfigs = {
+            chatgpt: {
+                name: 'ChatGPT',
+                color: '#10a37f',
+                greeting: "Hello! I'm a miniature version of ChatGPT, demonstrating decoder-only transformer architecture with RLHF training. I can help explain concepts, answer questions, and have conversations. What would you like to explore?",
+                responses: [
+                    "That's an interesting question! Using my pre-layer normalization and GELU activations...",
+                    "Let me process that through my transformer blocks with causal attention...",
+                    "Based on my RLHF training, here's my helpful response...",
+                    "My autoregressive architecture allows me to generate coherent responses...",
+                    "Drawing from my training data through attention mechanisms..."
+                ]
+            },
+            grok: {
+                name: 'Grok',
+                color: '#1d9bf0',
+                greeting: "Hey! I'm Mini Grok, powered by Mixture of Experts architecture. My specialized expert networks let me route different types of queries to the most suitable knowledge domains. Ready for some unconventional insights?",
+                responses: [
+                    "Routing to Expert Network 3 (Creative Thinking) for this query...",
+                    "My top-2 experts are activating: Math Expert and Philosophy Expert...",
+                    "Interesting! My expert gating mechanism is selecting unconventional pathways...",
+                    "Load balancing across my 4 expert networks for optimal response...",
+                    "Sparse activation engaged - only relevant experts firing for this one..."
+                ]
+            },
+            gemini: {
+                name: 'Gemini',
+                color: '#4285f4',
+                greeting: "Greetings! I'm Mini Gemini, featuring multi-query attention and SwiGLU activations. My architecture is optimized for multimodal understanding and efficient processing. I can analyze complex queries systematically!",
+                responses: [
+                    "Processing through my multi-query attention layers with shared K,V projections...",
+                    "My RoPE encoding is helping me understand the relationships here...",
+                    "Using SwiGLU activations for enhanced information processing...",
+                    "My multimodal architecture allows comprehensive analysis of this query...",
+                    "Applying rotary position encoding for better context understanding..."
+                ]
+            },
+            deepseek: {
+                name: 'DeepSeek',
+                color: '#ff6b6b',
+                greeting: "Hello! I'm Mini DeepSeek, featuring optimized Mixture of Experts with advanced load balancing. My architecture excels at systematic reasoning and mathematical logic. Let's dive deep into your question!",
+                responses: [
+                    "Applying load-balanced expert routing with noise injection for optimal selection...",
+                    "My SiLU activations are processing this through specialized reasoning experts...",
+                    "Using optimized MoE with auxiliary loss for balanced expert utilization...",
+                    "Systematic analysis through my reasoning-focused expert networks...",
+                    "Load balancing algorithms selecting optimal experts for this query type..."
+                ]
+            },
+            claude: {
+                name: 'Claude',
+                color: '#d97706',
+                greeting: "Hi! I'm Mini Claude, built with Constitutional AI principles and GLU activations. My architecture includes built-in safety mechanisms and ethical reasoning capabilities. I aim to be helpful, harmless, and honest!",
+                responses: [
+                    "Processing through GLU-gated layers while checking constitutional principles...",
+                    "My harmlessness scoring indicates this is a safe and helpful response...",
+                    "Using gated activations to ensure controlled and responsible information flow...",
+                    "Constitutional AI training guides me to provide balanced, ethical responses...",
+                    "Safety-first architecture ensuring my response meets helpfulness standards..."
+                ]
+            }
+        };
+
+        function openChat(modelType) {
+            currentModel = modelType;
+            const config = modelConfigs[modelType];
+            
+            document.documentElement.style.setProperty('--chat-color', config.color);
+            document.getElementById('chatTitle').textContent = `Chat with Mini ${config.name}`;
+            
+            if (!chatHistory[modelType]) {
+                chatHistory[modelType] = [];
+                addMessage('bot', config.greeting, modelType);
+            }
+            
+            displayChatHistory(modelType);
+            document.getElementById('chatModal').style.display = 'block';
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeChat() {
+            document.getElementById('chatModal').style.display = 'none';
+            currentModel = '';
+        }
+
+        function displayChatHistory(modelType) {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            if (chatHistory[modelType]) {
+                chatHistory[modelType].forEach(msg => {
+                    addMessageToDOM(msg.type, msg.content);
+                });
+            }
+            
+            scrollToBottom();
+        }
+
+        function addMessage(type, content, modelType = currentModel) {
+            if (!chatHistory[modelType]) {
+                chatHistory[modelType] = [];
+            }
+            
+            chatHistory[modelType].push({ type, content });
+            
+            if (modelType === currentModel) {
+                addMessageToDOM(type, content);
+                scrollToBottom();
+            }
+        }
+
+        function addMessageToDOM(type, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = content;
+            
+            messageDiv.appendChild(bubbleDiv);
+            messagesContainer.appendChild(messageDiv);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && currentModel) {
+                addMessage('user', message);
+                input.value = '';
+                
+                showTypingIndicator();
+                document.getElementById('sendBtn').disabled = true;
+                
+                setTimeout(() => {
+                    const response = generateResponse(message, currentModel);
+                    hideTypingIndicator();
+                    addMessage('bot', response);
+                    document.getElementById('sendBtn').disabled = false;
+                    input.focus();
+                }, 1500 + Math.random() * 2000);
+            }
+        }
+
+        function generateResponse(userMessage, modelType) {
+            const config = modelConfigs[modelType];
+            const lowerMessage = userMessage.toLowerCase();
+            
+            if (lowerMessage.includes('architecture') || lowerMessage.includes('how do you work')) {
+                return getArchitectureResponse(modelType);
+            }
+            
+            if (lowerMessage.includes('what are you') || lowerMessage.includes('who are you')) {
+                return `I'm a miniature implementation of ${config.name}, demonstrating ${getArchitectureDescription(modelType)}. I'm designed to show you how these AI systems work!`;
+            }
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return `Hello! I'm Mini ${config.name}. ${config.responses[Math.floor(Math.random() * config.responses.length)]}`;
+            }
+            
+            if (lowerMessage.length > 100 || 
+                lowerMessage.includes('complex') || 
+                lowerMessage.includes('detailed research') ||
+                lowerMessage.includes('comprehensive analysis')) {
+                return `I'm just a miniature implementation of ${config.name} and this question seems quite complex. Please use the full AI system for detailed analysis and comprehensive answers like this!`;
+            }
+            
+            const randomResponse = config.responses[Math.floor(Math.random() * config.responses.length)];
+            return `${randomResponse} Remember, I'm just a miniature demonstration of ${config.name}'s architecture. For full capabilities, please use the complete AI system!`;
+        }
+
+        function getArchitectureDescription(modelType) {
+            const descriptions = {
+                chatgpt: "decoder-only transformer architecture with RLHF training",
+                grok: "Mixture of Experts (MoE) with dynamic expert routing",
+                gemini: "multimodal transformer with multi-query attention and SwiGLU",
+                deepseek: "optimized MoE with load balancing and reasoning focus",
+                claude: "Constitutional AI with GLU activations and safety mechanisms"
+            };
+            return descriptions[modelType];
+        }
+
+        function getArchitectureResponse(modelType) {
+            const architectureInfo = {
+                chatgpt: "I use a decoder-only transformer with pre-layer normalization and GELU activations. My RLHF training aligns my responses with human preferences through reward modeling and policy optimization.",
+                grok: "I'm built with Mixture of Experts, where a gating network routes queries to the top-2 most relevant expert networks. This enables massive scaling with constant compute cost per token.",
+                gemini: "I use multi-query attention where key and value projections are shared across heads for efficiency. My SwiGLU activations and RoPE encoding enable superior multimodal understanding.",
+                deepseek: "I implement optimized MoE with load balancing to prevent expert collapse, noise injection for better exploration, and SiLU activations throughout for smooth gradient flow.",
+                claude: "I use GLU (Gated Linear Units) for controlled information flow and Constitutional AI training with built-in harmlessness and helpfulness scoring mechanisms."
+            };
+            
+            return architectureInfo[modelType];
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        document.getElementById('chatModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeChat();
+            }
+        });
+    </script>
+</body>
+</html>
