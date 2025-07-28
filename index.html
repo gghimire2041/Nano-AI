@@ -92,6 +92,64 @@
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .architecture-type:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .expandable {
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .expandable:hover {
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .expandable::after {
+            content: " ⓘ";
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .expandable.expanded::after {
+            content: " ⓧ";
+        }
+
+        .expansion-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.15);
+            margin-top: 0.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-left: 3px solid rgba(255, 255, 255, 0.5);
+            color: white; /* Ensure text is white on dark header backgrounds */
+        }
+
+        .expansion-content.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .card-content {
@@ -126,13 +184,19 @@
 
         .flow-step {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             padding: 1rem;
             margin-bottom: 0.5rem;
             background: white;
             border-radius: 8px;
             border-left: 4px solid var(--primary-color);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .step-number {
@@ -147,11 +211,34 @@
             margin-right: 1rem;
             font-weight: 600;
             font-size: 0.9rem;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .step-content {
+            flex: 1;
         }
 
         .step-text {
             font-size: 0.95rem;
             font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-expansion {
+            display: none;
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #666;
+            border-left: 3px solid var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        .step-expansion.show {
+            display: block;
+            animation: slideDown 0.3s ease;
         }
 
         .innovations-grid {
@@ -165,6 +252,13 @@
             padding: 1.5rem;
             border-radius: 12px;
             border-top: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .innovation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .innovation-title {
@@ -177,6 +271,23 @@
         .innovation-desc {
             font-size: 0.9rem;
             color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .innovation-expansion {
+            display: none;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #555;
+            border-left: 3px solid var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        .innovation-expansion.show {
+            display: block;
+            animation: slideDown 0.3s ease;
         }
 
         .specs-table {
@@ -207,6 +318,10 @@
 
         .specs-table tr:nth-child(even) {
             background: white;
+        }
+
+        .specs-table tr:hover {
+            background: #e2e8f0;
         }
 
         .chat-button {
@@ -393,8 +508,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 AI Architecture Showcase</h1>
-            <p>Explore the unique architectures behind the world's most advanced AI systems. Experience simulated neural network outputs from miniature models trained on character-level patterns!</p>
+            <h1>🤖 AI Architecture Deep Dive</h1>
+            <p>Explore the intricate architectures behind the world's most advanced AI systems. Discover how each model processes information through unique neural network designs and specialized components.</p>
         </div>
 
         <div class="models-grid">
@@ -404,7 +519,13 @@
                     <div class="model-icon">🧠</div>
                     <div class="model-title">ChatGPT</div>
                     <div class="model-company">OpenAI</div>
-                    <div class="architecture-type">Decoder-only Transformer + RLHF</div>
+                    <div class="architecture-type expandable" onclick="toggleExpansion(this)">
+                        <span class="expandable-text">Decoder-only Transformer + RLHF</span>
+                        <div class="expansion-content">
+                            <strong>Decoder-only Transformer:</strong> Uses only the decoder part of the original Transformer, making it specialized for autoregressive text generation (predicting next word based on previous words).<br><br>
+                            <strong>RLHF (Reinforcement Learning from Human Feedback):</strong> Training method where human reviewers rank model outputs, and the model learns to generate responses that humans prefer, improving alignment with human values.
+                        </div>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="description">
@@ -414,25 +535,55 @@
                     <div class="section">
                         <div class="section-title">🏗️ Architecture Flow</div>
                         <div class="process-flow">
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">1</div>
-                                <div class="step-text">Input Token Embedding + Positional Encoding</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Input Token Embedding + Positional Encoding</div>
+                                    <div class="step-expansion">
+                                        <strong>Token Embedding:</strong> Converts each word/character into a numerical vector (e.g., "hello" → [0.2, -0.5, 0.8, ...]). Each token gets a unique high-dimensional representation.<br><br>
+                                        <strong>Positional Encoding:</strong> Adds position information to tokens since transformers don't inherently understand word order. "I love cats" vs "cats love I" have different meanings despite same tokens.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">2</div>
-                                <div class="step-text">Pre-LayerNorm → Multi-Head Self-Attention</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Pre-LayerNorm → Multi-Head Self-Attention</div>
+                                    <div class="step-expansion">
+                                        <strong>Pre-LayerNorm:</strong> Normalizes inputs before processing (unlike original Transformer's post-norm). Improves training stability and gradient flow.<br><br>
+                                        <strong>Multi-Head Self-Attention:</strong> Allows each token to "look at" and gather information from all previous tokens. Multiple attention heads focus on different types of relationships (syntax, semantics, etc.).
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">3</div>
-                                <div class="step-text">Residual Connection + Pre-LayerNorm</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Residual Connection + Pre-LayerNorm</div>
+                                    <div class="step-expansion">
+                                        <strong>Residual Connection:</strong> Adds the input directly to the output (input + processed_input). Prevents vanishing gradients and allows information to flow through deep networks.<br><br>
+                                        <strong>Second Pre-LayerNorm:</strong> Normalizes again before the feed-forward network to maintain stable activations throughout the network.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">4</div>
-                                <div class="step-text">Feed-Forward Network (GELU Activation)</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Feed-Forward Network (GELU Activation)</div>
+                                    <div class="step-expansion">
+                                        <strong>Feed-Forward Network:</strong> Two linear transformations with a non-linear activation in between. Processes information from attention and applies learned transformations.<br><br>
+                                        <strong>GELU (Gaussian Error Linear Unit):</strong> Smooth activation function that's probabilistic rather than hard cutoff like ReLU. Provides better gradient flow and more nuanced activation patterns.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">5</div>
-                                <div class="step-text">Output Layer → Next Token Prediction</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Output Layer → Next Token Prediction</div>
+                                    <div class="step-expansion">
+                                        <strong>Output Layer:</strong> Projects the final hidden states back to vocabulary size, creating probability scores for each possible next token.<br><br>
+                                        <strong>Next Token Prediction:</strong> Selects the most likely next word/token based on all previous context. This autoregressive process continues to generate complete responses.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -440,21 +591,33 @@
                     <div class="section">
                         <div class="section-title">🔧 Key Innovations</div>
                         <div class="innovations-grid">
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Pre-Layer Normalization</div>
                                 <div class="innovation-desc">Applies LayerNorm before attention/FFN blocks for better gradient flow and training stability.</div>
+                                <div class="innovation-expansion">
+                                    Traditional transformers applied layer normalization after the attention/FFN blocks. GPT models moved this to before the blocks, which significantly improved training stability, especially for large models. This change allows gradients to flow more smoothly through the network during backpropagation, enabling training of much larger models without gradient explosion or vanishing.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">GELU Activation</div>
                                 <div class="innovation-desc">Gaussian Error Linear Units provide smoother, probabilistic activation compared to ReLU.</div>
+                                <div class="innovation-expansion">
+                                    GELU introduces stochasticity during training by multiplying inputs by a random variable from a Bernoulli distribution. Unlike ReLU's hard cutoff at zero, GELU provides smooth transitions. The function is x * Φ(x) where Φ is the cumulative distribution function of the standard Gaussian. This smoothness leads to better gradient flow and more nuanced feature learning.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">RLHF Training</div>
                                 <div class="innovation-desc">Reinforcement Learning from Human Feedback aligns model outputs with human preferences.</div>
+                                <div class="innovation-expansion">
+                                    RLHF involves three stages: 1) Supervised fine-tuning on demonstration data, 2) Training a reward model on human preference rankings, 3) Using PPO (Proximal Policy Optimization) to optimize the language model against the reward model. This process helps align the model's outputs with human values, making responses more helpful, harmless, and honest compared to pure language modeling objectives.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Causal Masking</div>
                                 <div class="innovation-desc">Ensures autoregressive generation - each token only attends to previous tokens.</div>
+                                <div class="innovation-expansion">
+                                    Causal masking prevents the model from "cheating" by looking at future tokens during training. It creates a lower triangular attention matrix where position i can only attend to positions ≤ i. This forces the model to learn true sequential dependencies and enables the same architecture to be used for both training (teacher forcing) and inference (autoregressive generation) without modification.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -506,7 +669,12 @@
                     <div class="model-icon">⚡</div>
                     <div class="model-title">Grok</div>
                     <div class="model-company">xAI</div>
-                    <div class="architecture-type">Mixture of Experts (MoE)</div>
+                    <div class="architecture-type expandable" onclick="toggleExpansion(this)">
+                        <span class="expandable-text">Mixture of Experts (MoE)</span>
+                        <div class="expansion-content">
+                            <strong>Mixture of Experts:</strong> Instead of using one large neural network, MoE uses multiple smaller "expert" networks and a gating mechanism that decides which experts to activate for each input. This allows massive model capacity while keeping computational cost manageable through sparse activation.
+                        </div>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="description">
@@ -516,25 +684,55 @@
                     <div class="section">
                         <div class="section-title">⚡ MoE Architecture Flow</div>
                         <div class="process-flow">
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">1</div>
-                                <div class="step-text">Input Processing & Token Embedding</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Input Processing & Token Embedding</div>
+                                    <div class="step-expansion">
+                                        <strong>Input Processing:</strong> Raw text is tokenized and converted into numerical representations that the model can understand.<br><br>
+                                        <strong>Token Embedding:</strong> Each token gets mapped to a dense vector representation in high-dimensional space. Similar tokens have similar embeddings, allowing the model to understand semantic relationships.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">2</div>
-                                <div class="step-text">Gating Network - Expert Selection</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Gating Network - Expert Selection</div>
+                                    <div class="step-expansion">
+                                        <strong>Gating Network:</strong> A learned neural network that examines each token and decides which expert networks should process it. Acts like a smart router directing traffic to the most appropriate specialists.<br><br>
+                                        <strong>Expert Selection:</strong> For each token, the gating network outputs probability scores for all experts, then selects the top-k experts (typically 2) to actually process the token.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">3</div>
-                                <div class="step-text">Top-K Expert Activation (Sparse)</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Top-K Expert Activation (Sparse)</div>
+                                    <div class="step-expansion">
+                                        <strong>Top-K Selection:</strong> Only the highest-scoring experts (typically 2 out of 8-64 total experts) are activated for each token. This is "sparse activation" - most of the model remains unused for any given input.<br><br>
+                                        <strong>Efficiency Gain:</strong> While the model has massive capacity, only a small fraction is used per token, keeping computational costs manageable while maintaining expressive power.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">4</div>
-                                <div class="step-text">Weighted Expert Output Combination</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Weighted Expert Output Combination</div>
+                                    <div class="step-expansion">
+                                        <strong>Weighted Combination:</strong> The outputs from selected experts are combined using the weights from the gating network. If Expert A gets 0.7 weight and Expert B gets 0.3 weight, the final output is 0.7×A + 0.3×B.<br><br>
+                                        <strong>Load Balancing:</strong> The system includes mechanisms to ensure experts are used roughly equally over time, preventing some experts from being ignored while others are overused.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">5</div>
-                                <div class="step-text">Final Prediction Generation</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Final Prediction Generation</div>
+                                    <div class="step-expansion">
+                                        <strong>Output Layer:</strong> The combined expert outputs are passed through final layers to generate probability distributions over the vocabulary.<br><br>
+                                        <strong>Token Selection:</strong> The model selects the next token based on these probabilities, continuing the autoregressive generation process to produce complete responses.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -542,21 +740,33 @@
                     <div class="section">
                         <div class="section-title">🔧 Key Innovations</div>
                         <div class="innovations-grid">
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Expert Routing</div>
                                 <div class="innovation-desc">Dynamic routing to specialized expert networks based on input context.</div>
+                                <div class="innovation-expansion">
+                                    Expert routing uses a learned gating function that examines the input and decides which experts are most suitable. Different experts might specialize in different domains (math, language, reasoning) or linguistic patterns. The routing is dynamic and learned during training, allowing the model to automatically discover optimal expert specializations without explicit human design.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Sparse Activation</div>
                                 <div class="innovation-desc">Only activates top-k experts per token, improving efficiency.</div>
+                                <div class="innovation-expansion">
+                                    Sparse activation is the key to MoE efficiency. Instead of running all experts for every token (which would be computationally prohibitive), only the top-k experts are activated. This typically means 2-8 experts out of dozens or hundreds total. The model maintains massive capacity while using only a fraction of its parameters for any given computation, achieving sub-linear scaling of computational cost with model size.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Load Balancing</div>
                                 <div class="innovation-desc">Ensures even expert utilization for optimal performance.</div>
+                                <div class="innovation-expansion">
+                                    Load balancing prevents expert collapse, where some experts become unused while others are overloaded. Techniques include auxiliary losses that encourage even expert usage, noise injection during training, and capacity constraints. This ensures all experts contribute to the model's capabilities and prevents computational bottlenecks from overused experts.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Gating Network</div>
                                 <div class="innovation-desc">Learned routing decisions for optimal expert selection.</div>
+                                <div class="innovation-expansion">
+                                    The gating network is typically a simple linear layer followed by softmax that produces probability distributions over experts. It learns to route tokens based on content, context, and task requirements. Advanced gating mechanisms include hierarchical routing, switch transformers, and routing with auxiliary losses to improve expert specialization and load balancing.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -571,7 +781,12 @@
                     <div class="model-icon">💎</div>
                     <div class="model-title">Gemini</div>
                     <div class="model-company">Google</div>
-                    <div class="architecture-type">Multimodal Transformer</div>
+                    <div class="architecture-type expandable" onclick="toggleExpansion(this)">
+                        <span class="expandable-text">Multimodal Transformer</span>
+                        <div class="expansion-content">
+                            <strong>Multimodal Transformer:</strong> A unified architecture that can process and understand multiple types of input (text, images, audio, video) simultaneously. Uses shared attention mechanisms to find relationships between different modalities, enabling understanding of complex multimodal content.
+                        </div>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="description">
@@ -581,25 +796,56 @@
                     <div class="section">
                         <div class="section-title">💎 Multimodal Flow</div>
                         <div class="process-flow">
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">1</div>
-                                <div class="step-text">Multimodal Input Encoding</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Multimodal Input Encoding</div>
+                                    <div class="step-expansion">
+                                        <strong>Text Encoding:</strong> Text tokens are embedded into vector space using learned embeddings.<br><br>
+                                        <strong>Image Encoding:</strong> Images are processed through vision transformers (ViT) that split images into patches, treat each patch as a token, and embed them into the same vector space as text.<br><br>
+                                        <strong>Unified Space:</strong> All modalities are projected into a shared high-dimensional space where they can interact through attention mechanisms.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">2</div>
-                                <div class="step-text">Cross-Modal Attention Layers</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Cross-Modal Attention Layers</div>
+                                    <div class="step-expansion">
+                                        <strong>Cross-Modal Attention:</strong> Allows text tokens to attend to image patches and vice versa. For example, the word "cat" in text can attend to cat-like regions in the image.<br><br>
+                                        <strong>Attention Mechanisms:</strong> Uses specialized attention patterns that can handle different sequence lengths and types (text sequences vs image patch grids) while maintaining computational efficiency.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">3</div>
-                                <div class="step-text">Unified Embedding Space</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Unified Embedding Space</div>
+                                    <div class="step-expansion">
+                                        <strong>Shared Representations:</strong> All modalities are mapped to the same vector space, allowing the model to find semantic relationships across different input types.<br><br>
+                                        <strong>Alignment:</strong> Through training, the model learns to align semantically similar concepts across modalities (e.g., the word "red" and red pixels in images occupy similar regions of the embedding space).
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">4</div>
-                                <div class="step-text">Multi-Query Attention Processing</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Multi-Query Attention Processing</div>
+                                    <div class="step-expansion">
+                                        <strong>Multi-Query Attention:</strong> An efficiency optimization where multiple attention heads share the same key and value projections but have separate query projections. Reduces memory usage and computational cost.<br><br>
+                                        <strong>Scalability:</strong> This design allows processing of long sequences and large images more efficiently while maintaining model expressiveness.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">5</div>
-                                <div class="step-text">Multimodal Output Generation</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Multimodal Output Generation</div>
+                                    <div class="step-expansion">
+                                        <strong>Text Generation:</strong> Standard autoregressive text generation using the enriched multimodal representations.<br><br>
+                                        <strong>Conditioned Generation:</strong> Text generation is conditioned on both text context and visual/audio content, allowing for detailed descriptions, visual question answering, and multimodal reasoning.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -607,21 +853,33 @@
                     <div class="section">
                         <div class="section-title">🔧 Key Innovations</div>
                         <div class="innovations-grid">
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Multi-Query Attention</div>
                                 <div class="innovation-desc">Shared key-value pairs across attention heads for efficiency.</div>
+                                <div class="innovation-expansion">
+                                    Multi-Query Attention (MQA) reduces the memory bandwidth bottleneck in transformer inference. Instead of having separate K and V matrices for each attention head, MQA shares one set of K and V across all heads while maintaining separate Q matrices. This significantly reduces memory usage and increases inference speed, especially for long sequences, with minimal impact on model quality.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">SwiGLU Activation</div>
                                 <div class="innovation-desc">Gated linear unit with SiLU activation for better performance.</div>
+                                <div class="innovation-expansion">
+                                    SwiGLU combines the Swish/SiLU activation function with a gating mechanism. The formula is SwiGLU(x) = Swish(xW + b) ⊙ (xV + c), where ⊙ is element-wise multiplication. This gating allows the model to selectively pass information through the network, leading to better performance than standard activations while maintaining similar computational cost.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">RoPE Encoding</div>
                                 <div class="innovation-desc">Rotary position encoding for better length generalization.</div>
+                                <div class="innovation-expansion">
+                                    Rotary Position Embedding (RoPE) encodes position information by rotating the feature dimensions of tokens based on their position. Unlike traditional position embeddings, RoPE naturally handles sequences longer than those seen during training. It maintains relative position information and has been shown to improve performance on tasks requiring understanding of position and order.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Cross-Modal Processing</div>
                                 <div class="innovation-desc">Unified attention across different input modalities.</div>
+                                <div class="innovation-expansion">
+                                    Cross-modal processing enables the model to understand relationships between different types of input. Text can reference visual elements, visual features can inform text generation, and the model can perform complex reasoning across modalities. This is achieved through shared attention mechanisms and aligned embedding spaces learned during multimodal training.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -636,7 +894,13 @@
                     <div class="model-icon">🔍</div>
                     <div class="model-title">DeepSeek</div>
                     <div class="model-company">DeepSeek AI</div>
-                    <div class="architecture-type">Optimized MoE + Reasoning</div>
+                    <div class="architecture-type expandable" onclick="toggleExpansion(this)">
+                        <span class="expandable-text">Optimized MoE + Reasoning</span>
+                        <div class="expansion-content">
+                            <strong>Optimized MoE:</strong> An improved Mixture of Experts architecture with advanced load balancing, expert routing optimizations, and noise injection for better expert utilization.<br><br>
+                            <strong>Reasoning Enhancement:</strong> Specialized components and training techniques designed to improve logical reasoning, mathematical problem-solving, and complex multi-step thinking.
+                        </div>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="description">
@@ -646,25 +910,55 @@
                     <div class="section">
                         <div class="section-title">🔍 Optimized MoE Flow</div>
                         <div class="process-flow">
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">1</div>
-                                <div class="step-text">Enhanced Input Processing</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Enhanced Input Processing</div>
+                                    <div class="step-expansion">
+                                        <strong>Input Analysis:</strong> Advanced preprocessing that analyzes input complexity and type to optimize routing decisions.<br><br>
+                                        <strong>Context Understanding:</strong> Enhanced context encoding that helps the gating network make better expert selection decisions based on task requirements and input characteristics.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">2</div>
-                                <div class="step-text">Noise-Injected Expert Gating</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Noise-Injected Expert Gating</div>
+                                    <div class="step-expansion">
+                                        <strong>Noise Injection:</strong> During training, controlled noise is added to gating decisions to encourage exploration of different expert combinations and prevent premature specialization.<br><br>
+                                        <strong>Improved Exploration:</strong> This helps discover better expert specializations and prevents the collapse where only a few experts are utilized while others remain unused.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">3</div>
-                                <div class="step-text">Load-Balanced Expert Selection</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Load-Balanced Expert Selection</div>
+                                    <div class="step-expansion">
+                                        <strong>Advanced Load Balancing:</strong> Sophisticated algorithms track expert usage over time and apply auxiliary losses to encourage even utilization across all experts.<br><br>
+                                        <strong>Dynamic Balancing:</strong> The system adapts expert selection to maintain optimal load distribution while preserving model performance and expert specialization.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">4</div>
-                                <div class="step-text">Reasoning-Optimized Processing</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Reasoning-Optimized Processing</div>
+                                    <div class="step-expansion">
+                                        <strong>Reasoning Modules:</strong> Specialized expert networks trained specifically for logical reasoning, mathematical computation, and multi-step problem solving.<br><br>
+                                        <strong>Chain of Thought:</strong> Enhanced capability for breaking down complex problems into steps and maintaining coherent reasoning chains throughout the generation process.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">5</div>
-                                <div class="step-text">Optimized Response Generation</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Optimized Response Generation</div>
+                                    <div class="step-expansion">
+                                        <strong>Efficient Generation:</strong> Optimized decoding strategies that leverage expert specializations for faster and more accurate response generation.<br><br>
+                                        <strong>Quality Control:</strong> Built-in mechanisms to ensure response quality and consistency, particularly for complex reasoning tasks.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -672,21 +966,33 @@
                     <div class="section">
                         <div class="section-title">🔧 Key Innovations</div>
                         <div class="innovations-grid">
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Advanced Load Balancing</div>
                                 <div class="innovation-desc">Sophisticated expert utilization tracking and balancing.</div>
+                                <div class="innovation-expansion">
+                                    DeepSeek implements advanced load balancing through multiple mechanisms: auxiliary losses that penalize uneven expert usage, expert capacity constraints, and dynamic routing adjustments. The system tracks expert utilization statistics over time and applies corrective measures to ensure all experts contribute meaningfully while maintaining computational efficiency and model performance.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Noise Injection</div>
                                 <div class="innovation-desc">Training-time noise for better expert exploration.</div>
+                                <div class="innovation-expansion">
+                                    Noise injection adds controlled randomness to expert gating decisions during training. This prevents the network from prematurely settling on suboptimal expert specializations and encourages exploration of different expert combinations. The noise is gradually reduced during training, allowing the model to discover robust expert specializations while maintaining final performance.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Reasoning Optimization</div>
                                 <div class="innovation-desc">Specialized modules for complex reasoning tasks.</div>
+                                <div class="innovation-expansion">
+                                    DeepSeek incorporates specialized reasoning modules designed for mathematical computation, logical inference, and multi-step problem solving. These modules use enhanced architectures optimized for sequential reasoning, working memory management, and error correction. Training includes specific reasoning datasets and techniques like chain-of-thought prompting to improve systematic thinking capabilities.
+                                </div>
                             </div>
-                            <div class="innovation-card">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
                                 <div class="innovation-title">Efficient Routing</div>
                                 <div class="innovation-desc">Optimized gating mechanisms for faster inference.</div>
+                                <div class="innovation-expansion">
+                                    Efficient routing uses lightweight gating networks and optimized expert selection algorithms to minimize computational overhead. Techniques include hierarchical routing, cached routing decisions, and approximate gating methods that maintain routing quality while reducing the computational cost of expert selection during inference.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -701,7 +1007,12 @@
                     <div class="model-icon">🎭</div>
                     <div class="model-title">Claude</div>
                     <div class="model-company">Anthropic</div>
-                    <div class="architecture-type">Constitutional AI</div>
+                    <div class="architecture-type expandable" onclick="toggleExpansion(this)">
+                        <span class="expandable-text">Constitutional AI</span>
+                        <div class="expansion-content">
+                            <strong>Constitutional AI:</strong> A training methodology where the AI is taught to follow a set of principles or "constitution" that guides its behavior. The model learns to critique and revise its own outputs based on these principles, leading to more helpful, harmless, and honest responses without relying solely on human feedback.
+                        </div>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="description">
@@ -711,25 +1022,89 @@
                     <div class="section">
                         <div class="section-title">🎭 Constitutional AI Flow</div>
                         <div class="process-flow">
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">1</div>
-                                <div class="step-text">Input Safety Assessment</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Input Safety Assessment</div>
+                                    <div class="step-expansion">
+                                        <strong>Safety Screening:</strong> Incoming prompts are analyzed for potential harmful content, manipulation attempts, or requests that could lead to unsafe outputs.<br><br>
+                                        <strong>Context Evaluation:</strong> The system evaluates the broader context and potential implications of the request to determine appropriate response strategies.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">2</div>
-                                <div class="step-text">GLU-Gated Processing</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">GLU-Gated Processing</div>
+                                    <div class="step-expansion">
+                                        <strong>Gated Linear Units:</strong> Advanced activation functions that use gating mechanisms to control information flow. GLU computes GLU(x) = (xW + b) ⊙ σ(xV + c), where ⊙ is element-wise multiplication and σ is a sigmoid function.<br><br>
+                                        <strong>Selective Activation:</strong> The gating mechanism allows the model to selectively emphasize or suppress different aspects of the input based on context and learned safety considerations.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">3</div>
-                                <div class="step-text">Constitutional Principles Check</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Constitutional Principles Check</div>
+                                    <div class="step-expansion">
+                                        <strong>Principle Evaluation:</strong> The model evaluates its potential responses against a set of constitutional principles (helpfulness, harmlessness, honesty) before generation.<br><br>
+                                        <strong>Self-Critique:</strong> Built-in mechanisms allow the model to critique and revise its own outputs to better align with constitutional principles, reducing the need for external oversight.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">4</div>
-                                <div class="step-text">Response Generation</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Response Generation</div>
+                                    <div class="step-expansion">
+                                        <strong>Guided Generation:</strong> Text generation is guided by constitutional principles, with the model actively working to produce helpful, accurate, and safe responses.<br><br>
+                                        <strong>Multi-Objective Optimization:</strong> The generation process balances multiple objectives: being helpful to the user, avoiding harm, and maintaining truthfulness.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flow-step">
+                            <div class="flow-step" onclick="toggleStepExpansion(this)">
                                 <div class="step-number">5</div>
-                                <div class="step-text">Harmlessness Verification</div>
+                                <div class="step-content">
+                                    <div class="step-text expandable">Harmlessness Verification</div>
+                                    <div class="step-expansion">
+                                        <strong>Output Screening:</strong> Generated responses undergo final safety checks using dedicated harmlessness evaluation heads that assess potential risks or harmful content.<br><br>
+                                        <strong>Quality Assurance:</strong> The system verifies that outputs meet constitutional standards before presenting them to users, with mechanisms to revise or regenerate if necessary.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">🔧 Key Innovations</div>
+                        <div class="innovations-grid">
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
+                                <div class="innovation-title">Constitutional Training</div>
+                                <div class="innovation-desc">Training methodology based on constitutional principles and self-critique.</div>
+                                <div class="innovation-expansion">
+                                    Constitutional AI training involves teaching the model a set of principles and training it to critique and revise its own outputs. The process includes: 1) Supervised fine-tuning with constitutional prompts, 2) Training the model to identify problematic outputs, 3) Teaching self-revision based on constitutional principles, 4) Reinforcement learning from AI feedback (RLAIF) where the model learns from its own critiques rather than human feedback.
+                                </div>
+                            </div>
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
+                                <div class="innovation-title">GLU Gating</div>
+                                <div class="innovation-desc">Advanced gating mechanisms for selective information processing.</div>
+                                <div class="innovation-expansion">
+                                    Gated Linear Units (GLU) provide sophisticated control over information flow within the network. The gating mechanism allows the model to selectively pass or block information based on context and learned patterns. This is particularly useful for safety applications, as the model can learn to suppress potentially harmful pathways while emphasizing helpful information processing routes.
+                                </div>
+                            </div>
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
+                                <div class="innovation-title">Harmlessness Evaluation</div>
+                                <div class="innovation-desc">Built-in evaluation heads for assessing response safety and appropriateness.</div>
+                                <div class="innovation-expansion">
+                                    Dedicated neural network heads trained specifically to evaluate the harmlessness and appropriateness of generated content. These evaluation systems work in parallel with text generation to assess potential risks, harmful content, or inappropriate responses. They can trigger response revision or alternative generation strategies when potential issues are detected.
+                                </div>
+                            </div>
+                            <div class="innovation-card" onclick="toggleInnovationExpansion(this)">
+                                <div class="innovation-title">Self-Critique Mechanisms</div>
+                                <div class="innovation-desc">Built-in ability to evaluate and improve its own outputs.</div>
+                                <div class="innovation-expansion">
+                                    Claude incorporates mechanisms that allow it to step back and critique its own responses against constitutional principles. This includes detecting potential issues in its outputs, reasoning about why something might be problematic, and generating improved alternatives. This self-critique capability reduces reliance on external oversight while improving response quality and safety.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -762,7 +1137,69 @@
 
     <script>
         // ============================================================================
-        // GLOBAL VARIABLES AND CONFIGURATION
+        // EXPANDABLE CONTENT FUNCTIONALITY
+        // ============================================================================
+        
+        function toggleExpansion(element) {
+            const expansion = element.querySelector('.expansion-content');
+            const expandable = element.querySelector('.expandable-text') || element;
+            
+            if (expansion.classList.contains('show')) {
+                expansion.classList.remove('show');
+                expandable.classList.remove('expanded');
+            } else {
+                // Close other expansions in the same card
+                const card = element.closest('.model-card');
+                card.querySelectorAll('.expansion-content.show').forEach(exp => {
+                    exp.classList.remove('show');
+                    const expText = exp.parentElement.querySelector('.expandable-text') || exp.parentElement;
+                    expText.classList.remove('expanded');
+                });
+                
+                expansion.classList.add('show');
+                expandable.classList.add('expanded');
+            }
+        }
+
+        function toggleStepExpansion(stepElement) {
+            const expansion = stepElement.querySelector('.step-expansion');
+            const expandableText = stepElement.querySelector('.expandable');
+            
+            if (expansion.classList.contains('show')) {
+                expansion.classList.remove('show');
+                expandableText.classList.remove('expanded');
+            } else {
+                // Close other step expansions in the same flow
+                const flow = stepElement.closest('.process-flow');
+                flow.querySelectorAll('.step-expansion.show').forEach(exp => {
+                    exp.classList.remove('show');
+                    const expText = exp.parentElement.querySelector('.expandable');
+                    expText.classList.remove('expanded');
+                });
+                
+                expansion.classList.add('show');
+                expandableText.classList.add('expanded');
+            }
+        }
+
+        function toggleInnovationExpansion(cardElement) {
+            const expansion = cardElement.querySelector('.innovation-expansion');
+            
+            if (expansion.classList.contains('show')) {
+                expansion.classList.remove('show');
+            } else {
+                // Close other innovation expansions in the same grid
+                const grid = cardElement.closest('.innovations-grid');
+                grid.querySelectorAll('.innovation-expansion.show').forEach(exp => {
+                    exp.classList.remove('show');
+                });
+                
+                expansion.classList.add('show');
+            }
+        }
+
+        // ============================================================================
+        // CHAT FUNCTIONALITY
         // ============================================================================
         
         let currentModel = '';
@@ -772,35 +1209,30 @@
             chatgpt: {
                 name: 'ChatGPT',
                 color: '#10a37f',
-                greeting: "Hello! I'm Mini ChatGPT with ~32K parameters (d_model=32, n_heads=2, n_layers=2). I use decoder-only transformer with pre-layer normalization, GELU activations, and RLHF simulation. My tiny neural network creates unique character-level patterns!"
+                greeting: "Hello! I'm Mini ChatGPT with ~31K parameters (d_model=32, n_heads=2, n_layers=2). I use decoder-only transformer with pre-layer normalization, GELU activations, and RLHF components. My neural network creates unique character-level patterns!"
             },
             grok: {
                 name: 'Grok',
                 color: '#1d9bf0',
-                greeting: "Hey! I'm Mini Grok with ~40K parameters using Mixture of Experts (num_experts=2, top_k=2 routing). I have 2 transformer layers with multi-query attention and MoE FFN layers. My expert routing creates distinctive response patterns!"
+                greeting: "Hey! I'm Mini Grok with ~48K parameters using Mixture of Experts (num_experts=2, top_k=2 routing). I have 2 transformer layers with MoE FFN layers that create distinctive expert-routed response patterns!"
             },
             gemini: {
                 name: 'Gemini',
                 color: '#4285f4',
-                greeting: "Greetings! I'm Mini Gemini with ~35K parameters (d_model=32, n_heads=2, n_layers=2). I use multi-query attention, rotary position embeddings, and SwiGLU activations. My character-level tokenizer produces unique multimodal-inspired outputs!"
+                greeting: "Greetings! I'm Mini Gemini with ~32K parameters (d_model=32, n_heads=2, n_layers=2). I use multi-query attention, rotary position embeddings, and SwiGLU activations. My character-level tokenizer produces unique multimodal-inspired outputs!"
             },
             deepseek: {
                 name: 'DeepSeek',
                 color: '#ff6b6b',
-                greeting: "Hello! I'm Mini DeepSeek with ~40K parameters using optimized MoE (num_experts=2, top_k=2 with load balancing). I have 2 layers with multi-query attention and noise-injected expert routing. My training produces specialized reasoning patterns!"
+                greeting: "Hello! I'm Mini DeepSeek with ~48K parameters using optimized MoE (num_experts=2, top_k=2 with load balancing). I have noise-injected expert routing and specialized reasoning modules that produce analytical patterns!"
             },
             claude: {
                 name: 'Claude',
                 color: '#d97706',
-                greeting: "Hi! I'm Mini Claude with ~35K parameters using Constitutional AI simulation (d_model=32, n_layers=2). I have GLU gating, harmfulness/helpfulness evaluation heads, and constitutional training. My responses follow safety-oriented patterns!"
+                greeting: "Hi! I'm Mini Claude with ~33K parameters using Constitutional AI principles (d_model=32, n_layers=2). I have GLU gating, harmfulness/helpfulness evaluation heads, and constitutional training that guides my safety-oriented responses!"
             }
         };
 
-        // ============================================================================
-        // GIBBERISH RESPONSE GENERATION - Each model has unique "neural patterns"
-        // Based on character-level training from nano_AI.py models
-        // ============================================================================
-        
         const responsePatterns = {
             chatgpt: {
                 patterns: [
@@ -848,7 +1280,6 @@
             const patterns = responsePatterns[modelType];
             if (!patterns) return "Unknown model response";
             
-            // Create pseudo-neural response based on input length and model type
             const inputLength = userMessage.length;
             const responseLength = Math.min(Math.max(inputLength, 20), 60);
             
@@ -856,12 +1287,10 @@
             let currentLength = 0;
             
             while (currentLength < responseLength) {
-                // Pick random pattern
                 const pattern = patterns.patterns[Math.floor(Math.random() * patterns.patterns.length)];
                 response += pattern;
                 currentLength += pattern.length;
                 
-                // Add connector
                 if (currentLength < responseLength - 10) {
                     const connector = patterns.connectors[Math.floor(Math.random() * patterns.connectors.length)];
                     response += " " + connector + " ";
@@ -869,7 +1298,6 @@
                 }
             }
             
-            // Add model-specific ending
             const ending = patterns.endings[Math.floor(Math.random() * patterns.endings.length)];
             response += " " + ending;
             
@@ -877,16 +1305,10 @@
         }
 
         async function generateResponse(userMessage, modelType) {
-            // Simulate network delay like real API
             await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
-            
             return generateGibberishResponse(userMessage, modelType);
         }
 
-        // ============================================================================
-        // GLOBAL CHAT FUNCTIONS - MUST BE GLOBAL FOR ONCLICK HANDLERS
-        // ============================================================================
-        
         function openChat(modelType) {
             console.log('🚀 Opening chat for:', modelType);
             currentModel = modelType;
@@ -906,13 +1328,11 @@
         }
 
         function closeChat() {
-            console.log('🚪 Closing chat');
             document.getElementById('chatModal').style.display = 'none';
             currentModel = '';
         }
 
         function sendMessage() {
-            console.log('📤 Sending message');
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             
@@ -931,19 +1351,14 @@
                         input.focus();
                     })
                     .catch(error => {
-                        console.error('💥 Response error:', error);
                         hideTypingIndicator();
-                        addMessage('bot', `Error: ${error.message}`);
+                        addMessage('bot', `Error generating response: ${error.message}`);
                         document.getElementById('sendBtn').disabled = false;
                         input.focus();
                     });
             }
         }
 
-        // ============================================================================
-        // HELPER FUNCTIONS
-        // ============================================================================
-        
         function displayChatHistory(modelType) {
             const messagesContainer = document.getElementById('chatMessages');
             messagesContainer.innerHTML = '';
@@ -1002,9 +1417,8 @@
         // ============================================================================
         
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 AI Models Showcase loaded, initializing...');
+            console.log('🚀 Interactive AI Architecture Showcase loaded!');
             
-            // Add Enter key support for chat input
             document.getElementById('chatInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -1012,23 +1426,24 @@
                 }
             });
             
-            // Close modal when clicking outside
             document.getElementById('chatModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeChat();
                 }
             });
             
-            console.log('✅ All mini AI models ready for demonstration!');
+            console.log('✅ All interactive features ready!');
             console.log('🤖 Available models:', Object.keys(modelConfigs));
         });
 
-        // Make functions globally available
         window.openChat = openChat;
         window.closeChat = closeChat;
         window.sendMessage = sendMessage;
+        window.toggleExpansion = toggleExpansion;
+        window.toggleStepExpansion = toggleStepExpansion;
+        window.toggleInnovationExpansion = toggleInnovationExpansion;
         
-        console.log('🎯 AI Models Interface Ready!');
+        console.log('🎯 Interactive AI Architecture Educational Showcase Ready!');
     </script>
 </body>
 </html>
